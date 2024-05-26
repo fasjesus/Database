@@ -59,13 +59,13 @@ CREATE TABLE ReservaCliente (
 
 -- Insere hoteis
 INSERT INTO Hotel (Nome, cnpj, Endereco, Cidade, Estado, Pais, Telefone, Email) 
-VALUES ('Hotel Prime', '123.456.789/0001-01', 'Rua cinco, 123', 'ilheus', 'Bahia', 'Brasil', '733456-7890', 'contato@hotelprime.com');	
+VALUES ('Hotel Prime', '123.456.789/0001-01', 'Rua cinco, 123', 'ilheus', 'Bahia', 'Brasil', '733456-7890', 'hotelprime@gmail.com');	
 
 INSERT INTO Hotel (Nome, cnpj, Endereco, Cidade, Estado, Pais, Telefone, Email)
-VALUES ('Hotel Aldeia', '234.567.890/0001-02', 'Avenida Olivenca, 456', 'ilheus', 'Bahia', 'Brasil', '732345-6789', 'contato@hotelaldeia.com');
+VALUES ('Hotel Aldeia', '234.567.890/0001-02', 'Avenida Olivenca, 456', 'ilheus', 'Bahia', 'Brasil', '732345-6789', 'hotelaldeia@gmail.com');
 
 INSERT INTO Hotel (Nome, cnpj, Endereco, Cidade, Estado, Pais, Telefone, Email)
-VALUES ('Hotel Premium', '345.678.901/0001-03', 'Travessa dois, 789', 'ilheus', 'Bahia', 'Brasil', '733456-7890', 'contato@hotelpremium.com');
+VALUES ('Hotel Premium', '345.678.901/0001-03', 'Travessa dois, 789', 'ilheus', 'Bahia', 'Brasil', '733456-7890', 'hotelpremium@gmail.com');
 
 -- Insere quartos
 INSERT INTO Quarto (Id_hotel, NumeroQuarto, TipoQuarto, Preco, Status)
@@ -100,13 +100,13 @@ VALUES (3, "2024-05-25", "2024-06-02", "Desocupado");
 
 -- Insere clientes
 INSERT INTO CLIENTE (nome_completo, cpf, idade, user_name, senha, email) 
-VALUES ("Flávia Alessandra Santos de Jesus", "12134356578", 21, "fullflavy", "fravineas123", "fullflavy@email.com");
+VALUES ("Flávia Alessandra Santos de Jesus", "12134356578", 21, "fullflavy", "fravineas123", "fullflavy@gmail.com");
 
 INSERT INTO CLIENTE (nome_completo, cpf, idade, user_name, senha, email) 
-VALUES ("Bruno Santos Costa", "12345678900", 24, "brunoatsoc", "bruno123", "bruno@email.com");
+VALUES ("Bruno Peruano", "12345678900", 24, "brunoperuano", "bruno123", "bruno@gmail.com");
 
 INSERT INTO CLIENTE (nome_completo, cpf, idade, user_name, senha, email) 
-VALUES ("Brenda Castro", "12223334456", 21, "brendacastro", "brenda123", "brenda@email.com");
+VALUES ("Brenda Castro", "12223334456", 21, "brendacastro", "brenda123", "brenda@gmail.com");
 
 -- Insere reservas de um cliente
 INSERT INTO ReservaCliente (Id_reserva, cpf_cliente, user_name_cliente) 
