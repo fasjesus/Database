@@ -103,7 +103,7 @@ INSERT INTO CLIENTE (nome_completo, cpf, idade, user_name, senha, email)
 VALUES ("Flávia Alessandra Santos de Jesus", "12134356578", 21, "fullflavy", "fravineas123", "fullflavy@gmail.com");
 
 INSERT INTO CLIENTE (nome_completo, cpf, idade, user_name, senha, email) 
-VALUES ("Bruno Peruano", "12345678900", 24, "brunoperuano", "bruno123", "bruno@gmail.com");
+VALUES ("Bruno Peruno", "12345678900", 24, "brunoperuno", "bruno123", "bruno@gmail.com");
 
 INSERT INTO CLIENTE (nome_completo, cpf, idade, user_name, senha, email) 
 VALUES ("Brenda Castro", "12223334456", 21, "brendacastro", "brenda123", "brenda@gmail.com");
@@ -118,7 +118,7 @@ SET Status = "Ocupado"
 WHERE Id_reserva = 1;
 
 INSERT INTO ReservaCliente (Id_reserva, cpf_cliente, user_name_cliente) 
-VALUES (2, "12345678900", "brunoatsoc");
+VALUES (2, "12345678900", "brunoperuno");
 
 -- Atualiza o status do quarto (pois quando um usuario faz a reserva do quarto, a reserva dele precisa ser atualizada para Status = ocupado
 UPDATE Reserva 
