@@ -54,7 +54,6 @@ CREATE TABLE ReservaCliente (
     FOREIGN KEY (Id_reserva) REFERENCES Reserva(Id_reserva),
     FOREIGN KEY (cpf_cliente, user_name_cliente) REFERENCES CLIENTE(cpf, user_name)
 );
--- Fim criação das tabelas
 
 -- INSERÇÕES
 
