@@ -91,8 +91,8 @@ JOIN RESERVA ON QUARTO.Id_quarto = RESERVA.FK_Id_quarto
 JOIN CLIENTE ON CLIENTE.cpf = RESERVA.FK_cpf; 
 
 -- Mostra os quartos disponíveis (vai mostrar 6 quartos)
-SELECT NumeroQuarto, TipoQuarto, Preco, Quarto.Status FROM Quarto 
-WHERE Quarto.Status = "Disponível";
+SELECT NumeroQuarto, TipoQuarto, Preco, QUARTO.Status FROM QUARTO
+WHERE QUARTO.Status = "Disponível";
 
 -- Deleta o quarto na posição 9 (última posição)
 DELETE FROM QUARTO WHERE Id_quarto = '9';
