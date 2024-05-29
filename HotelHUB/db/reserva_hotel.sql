@@ -3,6 +3,7 @@ CREATE DATABASE IF NOT EXISTS reserva_hotel;
 USE reserva_hotel;
 
 CREATE TABLE CLIENTE (
+    user_name VARCHAR(255),
 	nome_completo VARCHAR(100),
 	cpf VARCHAR(20),
 	idade INTEGER,
@@ -46,14 +47,14 @@ VALUES
 
 
 -- Insere clientes
-INSERT INTO CLIENTE (nome_completo, cpf, idade, senha, email) 
-VALUES ("Flávia Alessandra Santos de Jesus", "12134356578", 21, "fravineas123", "fullflavy@gmail.com");
+INSERT INTO CLIENTE (user_name, nome_completo, cpf, idade, senha, email) 
+VALUES ("fullflavy", "Flávia Alessandra Santos de Jesus", "12134356578", 21, "fravineas123", "fullflavy@gmail.com");
 
-INSERT INTO CLIENTE (nome_completo, cpf, idade, senha, email) 
-VALUES ("Bruno Peruno", "12345678900", 24, "bruno123", "bruno@gmail.com");
+INSERT INTO CLIENTE (user_name, nome_completo, cpf, idade, senha, email) 
+VALUES ("bperuno", "Bruno Peruno", "12345678900", 24, "bruno123", "bruno@gmail.com");
 
-INSERT INTO CLIENTE (nome_completo, cpf, idade, senha, email) 
-VALUES ("Brenda Castro", "12223334456", 21, "brenda123", "brenda@gmail.com");
+INSERT INTO CLIENTE (user_name, nome_completo, cpf, idade, senha, email) 
+VALUES ("bcastro", "Brenda Castro", "12223334456", 21, "brenda123", "brenda@gmail.com");
 
 
 -- Insere reservas
