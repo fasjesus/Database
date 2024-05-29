@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS reserva_hotel;
 USE reserva_hotel;
 
 CREATE TABLE CLIENTE (
-    user_name VARCHAR(255),
+        user_name VARCHAR(255),
 	nome_completo VARCHAR(100),
 	cpf VARCHAR(20),
 	idade INTEGER,
