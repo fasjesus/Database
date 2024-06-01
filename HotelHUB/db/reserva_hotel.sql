@@ -1,13 +1,14 @@
--- Esse Database foi criado por Brenda C. da Silva e Flávia A. S. de Jesus para a composição de um crédito na 
--- disciplina de Banco de Dados.           
--- Maio/Junho de 2024.
+/* Esse Database foi criado por Brenda C. da Silva e Flávia A. S. de Jesus para a composição de um crédito na 
+ disciplina de Banco de Dados.           
+ Maio/Junho de 2024. 
+*/ 
 
 CREATE DATABASE IF NOT EXISTS reserva_hotel; 
 
 USE reserva_hotel;
 
 CREATE TABLE CLIENTE (
-        user_name VARCHAR(255),
+    user_name VARCHAR(255),
 	nome_completo VARCHAR(100),
 	cpf VARCHAR(20),
 	idade INTEGER,
