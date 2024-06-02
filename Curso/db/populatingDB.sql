@@ -17,11 +17,8 @@ VALUES
     (12, 9804, 'Português', 'Mat'),
     (14, 9803, 'Matemática', 'Mat'),
     (17, 9804, 'Biologia', 'Mat'),
-    (13, 9801, 'Português', 'Not'),
     (11, 9805, 'Física', 'Not'),
-    (19, 9813, 'Biologia', 'Mat'),
     (20, 9802, 'Química', 'Mat'),
-    (16, 9801, 'Matemática', 'Not'),
     (10, 9803, 'Português', 'Not'),
     (21, 9804, 'Física', 'Not'),
     (22, 9802, 'Matemática', 'Not');

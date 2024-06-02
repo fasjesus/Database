@@ -66,8 +66,9 @@ SELECT e.nome,
        e.dt_nascimento, 
        d.disciplina
 FROM ESTUDANTE e
-JOIN DISCIPLINA d ON e.id_estudante = d.FK_id_estudante
+INNER JOIN DISCIPLINA d ON e.id_estudante = d.FK_id_estudante
 WHERE e.dt_nascimento IS NULL;
+
 
 -- Query com todos estudantes e respectivas disciplinas, agrupados por disciplina, com idade abaixo de 16 anos (usar inner join):
 
@@ -75,6 +76,6 @@ SELECT d.disciplina,
        e.nome, 
        YEAR(CURDATE()) - YEAR(STR_TO_DATE(e.dt_nascimento, '%d/%m/%Y')) AS idade
 FROM ESTUDANTE e
-JOIN DISCIPLINA d ON e.id_estudante = d.FK_id_estudante
+INNER JOIN DISCIPLINA d ON e.id_estudante = d.FK_id_estudante
 WHERE YEAR(CURDATE()) - YEAR(STR_TO_DATE(e.dt_nascimento, '%d/%m/%Y')) < 16
-GROUP BY d.disciplina, e.nome;
+ORDER BY d.disciplina, e.nome;
