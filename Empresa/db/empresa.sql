@@ -84,3 +84,21 @@ CREATE TABLE Categorias (
     Descr varchar(15) DEFAULT NULL,
     PRIMARY KEY (CodCategoria)
 );
+
+-- Restrições para a tabela `detalhesped` --
+
+ALTER TABLE DetalhesPed
+  ADD CONSTRAINT DetalhesPed_ibfk_1 FOREIGN KEY (NumPed) REFERENCES Pedidos (NumPed) ON DELETE CASCADE,
+  ADD CONSTRAINT DetalhesPed_ibfk_2 FOREIGN KEY (CodProd) REFERENCES Produtos (CodProd) ON DELETE CASCADE;
+
+-- Restrições para a tabela `pedidos` --
+
+ALTER TABLE Pedidos
+  ADD CONSTRAINT Pedidos_ibfk_1 FOREIGN KEY (CodCli) REFERENCES Clientes (CodCli) ON DELETE CASCADE,
+  ADD CONSTRAINT Pedidos_ibfk_2 FOREIGN KEY (CodFun) REFERENCES Funcionarios (CodFun) ON DELETE CASCADE;
+
+-- Restrições para a tabela `produtos` --
+
+ALTER TABLE Produtos
+  ADD CONSTRAINT Produtos_ibfk_1 FOREIGN KEY (CodCategoria) REFERENCES Categorias (CodCategoria) ON DELETE CASCADE,
+  ADD CONSTRAINT Produtos_ibfk_2 FOREIGN KEY (CodFor) REFERENCES Fornecedores (CodFor) ON DELETE CASCADE;

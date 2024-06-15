@@ -1,4 +1,4 @@
-1. Selecionar todos os pedidos, nome, sobrenome e cargo do funcionário que emitiu pedidos com total de preço abaixo de R$ 10,00.
+-- 1. Selecionar todos os pedidos, nome, sobrenome e cargo do funcionário que emitiu pedidos com total de preço abaixo de R$ 10,00.
 
 SELECT 
     p.NumPed,
@@ -18,29 +18,24 @@ HAVING
     Total < 10.00;
 
 
-2. Recuperar todos os funcionários e os respectivos clientes atendidos cujo valor do pedido está acima de R$ 50,00.
+-- 2. Recuperar todos os funcionários e os respectivos clientes atendidos cujo valor do pedido está acima de R$ 50,00. 
 
-SELECT 
-    f.Nome,
+SELECT  
+    c.Nome AS Cliente,
+    f.Nome AS Funcionario,
     f.Sobrenome,
     f.Cargo,
-    c.Nome AS Cliente,
-    SUM(d.Preco * d.Qtde - d.Desconto) AS ValorPedido
-FROM 
-    pedidos p
-JOIN 
-    detalhesped d ON p.NumPed = d.NumPed
-JOIN 
-    funcionarios f ON p.CodFun = f.CodFun
-JOIN 
-    clientes c ON p.CodCli = c.CodCli
-GROUP BY 
-    f.CodFun, c.CodCli
-HAVING 
-    ValorPedido > 50.00;
+    SUM(d.Preco * d.Qtde - d.Desconto) as Total
+FROM pedidos p
+JOIN detalhesped d ON p.NumPed = d.NumPed
+JOIN funcionarios f ON p.CodFun = f.CodFun
+JOIN clientes c ON p.CodCli = c.CodCli
+GROUP BY f.CodFun, c.CodCli
+HAVING Total > 50.00;
 
 
-3. Complete a instrução para retornar todos os nomes e cargos dos funcionários e os respectivos nomes clientes atendidos cujo valor do pedido está acima de R$ 40,00 e produtos com preço acima de R$ 11,00 e não foram descontinuados.
+-- 3. Complete a instrução para retornar todos os nomes e cargos dos funcionários e os respectivos nomes clientes atendidos 
+-- cujo valor do pedido está acima de R$ 40,00 e produtos com preço acima de R$ 11,00 e não foram descontinuados.
 
 
 SELECT 
@@ -48,7 +43,7 @@ SELECT
     f.Nome,
     f.Cargo,
     c.Nome AS Cliente,
-    SUM(d.Preco * d.Qtde - d.Desconto) AS Valor,
+    SUM(d.Preco) AS Valor,
     prod.Descontinuado,
     prod.Preco
 FROM 
@@ -69,7 +64,8 @@ HAVING
     Valor > 40.00;
 
 
-4. Retornar o cargo, o salário mínimo e salário máximo de todos os funcionários que tenham cargo de Representante na empresa ordenado ascendentemente.
+-- 4. Retornar o cargo, o salário mínimo e salário máximo de todos os funcionários que tenham cargo de Representante na empresa 
+-- ordenado ascendentemente.
 
 
 SELECT 
@@ -79,34 +75,49 @@ SELECT
 FROM 
     funcionarios
 WHERE 
-    Cargo = 'Representante'
+    Cargo = 'Representante de Vendas'
 GROUP BY 
-    Cargo
+    Cargo, Salario
 ORDER BY 
-    Cargo ASC;
+    SalarioMinimo ASC;
 
 
-5. Instrução com ROLLUP para extrair informações conforme solicitado.
+/* 5. Considere a instrução com rollup abaixo e complete para extrair informações com: 
+número de pedidos, nome de cliente, descrição de produtos, frete do pedido, preço do produto 
+e total entre o preço do produto e frete por cliente, para preço de produtos maior que 50.
 
+SELECT _______________,____________________,________________________,
+format(sum(pedidos.frete),2) as frete,
+format(sum(produtos.preco),2) as preco,
+format(___________________________,2) as total
+FROM ___________,____________,____________,_____________
+WHERE
+pedidos.codcli=clientes.codcli AND
+pedidos.numped=detalhesped.numped and
+produtos.codprod=detalhesped.codprod and
+detalhesped.preco < 50
+GROUP by ___________,_____________WITH ROLLUP
+*/
 
 SELECT 
-    clientes.Nome AS Cliente,
-    produtos.Descr AS Produto,
-    pedidos.Frete,
-    FORMAT(SUM(produtos.Preco), 2) AS Preco,
-    FORMAT(SUM(produtos.Preco + pedidos.Frete), 2) AS Total
+    pedidos.numped AS NumeroPedidos,
+    clientes.nome AS NomeCliente,
+    produtos.descr AS DescricaoProduto,
+    FORMAT(SUM(pedidos.frete), 2) AS Frete,
+    FORMAT(SUM(produtos.preco), 2) AS PrecoProduto,
+    FORMAT(SUM(produtos.preco + pedidos.frete), 2) AS Total
 FROM 
     pedidos
 JOIN 
-    detalhesped ON pedidos.NumPed = detalhesped.NumPed
+    detalhesped ON pedidos.numped = detalhesped.numped
 JOIN 
-    produtos ON detalhesped.CodProd = produtos.CodProd
+    produtos ON detalhesped.codprod = produtos.codprod
 JOIN 
-    clientes ON pedidos.CodCli = clientes.CodCli
-WHERE 
-    produtos.Preco > 50
+    clientes ON pedidos.codcli = clientes.codcli
+WHERE
+    produtos.preco > 50
 GROUP BY 
-    clientes.Nome, produtos.Descr, pedidos.Frete
+    pedidos.numped, clientes.nome, produtos.descr
 WITH ROLLUP;
 
 
