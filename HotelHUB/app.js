@@ -93,8 +93,8 @@ app.get("/reserveList", (req, res) => {
 
 
 //Rota para renderizar a pagina atualizar.ejs
-app.get("/atualizar", (req, res) => {
-    res.render("atualizar.ejs"); //Renderiza a pagina atualizar.ejs
+app.get("/update", (req, res) => {
+    res.render("update.ejs"); //Renderiza a pagina atualizar.ejs
 });//Fim
 
 //Rota para fazer a atualização dos dados do usuario
@@ -110,8 +110,8 @@ app.post("/atualizarConta", (req, res) => {
 });//Fim
 
 //Rota para renderizar a pagina de deletar conta
-app.get("/deletar", (req, res) =>{
-    res.render("deletar.ejs"); //renderiza a pagina deletar.ejs
+app.get("/delete", (req, res) =>{
+    res.render("delete.ejs"); //renderiza a pagina deletar.ejs
 });
 
 //Rota para deletar conta
