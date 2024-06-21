@@ -62,6 +62,35 @@ app.get("/options", (req, res) => {
     }
 });
 
+// Rota para renderizar a página de lista de reservas
+app.get("/reserveList", (req, res) => {
+    const { status, tipo } = req.query;
+
+    let query = "SELECT * FROM QUARTO";
+    let queryParams = [];
+
+    if (status || tipo) {
+        query += " WHERE";
+        if (status) {
+            query += " Status = ?";
+            queryParams.push(status);
+        }
+        if (status && tipo) {
+            query += " AND";
+        }
+        if (tipo) {
+            query += " TipoQuarto = ?";
+            queryParams.push(tipo);
+        }
+    }
+
+    connection.query(query, queryParams, (err, results) => {
+        if (err) throw err;
+        res.render("reserveList", { quartos: results });
+    });
+});
+
+
 
 //Rota para renderizar a pagina atualizar.ejs
 app.get("/atualizar", (req, res) => {

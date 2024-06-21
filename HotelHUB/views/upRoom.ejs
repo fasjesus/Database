@@ -53,7 +53,7 @@
     </style>
 </head>
 <body>
-    <form action="/upRoom" method="POST">
+    <form id="quartoForm" action="/upRoom" method="POST" onsubmit="formatPrice()">
         <h1>Cadastrar Quarto</h1>
         <div>
             <label for="NumeroQuarto">Número do Quarto:</label>
@@ -86,12 +86,17 @@
             const preco = document.getElementById('Preco');
 
             if (tipoQuarto === 'Standard') {
-                preco.value = 'R$150,00';
+                preco.value = '150.00';
             } else if (tipoQuarto === 'Luxo') {
-                preco.value = 'R$200,00';
+                preco.value = '200.00';
             } else {
                 preco.value = '';
             }
+        }
+
+        function formatPrice() {
+            const preco = document.getElementById('Preco');
+            preco.value = preco.value.replace('R$', '').replace(',', '.');
         }
     </script>
 </body>
