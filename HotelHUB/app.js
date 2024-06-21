@@ -22,11 +22,11 @@ let clienteNome = null; // Guarda o nome do cliente
 
 // Configura o banco de dados MySQL
 const connection = mysql.createConnection({
-    host: "localhost", // Nome do servidor
-    user: "root", // Usuário do servidor
-    password: "senia", // Senha do servidor
-    database: "reserva_hotel", // Nome do banco de dados
-});
+    host: "localhost", //Nome do servidor
+    user: "root", //Usuario do servidor
+    password: "", //Senha do servidor
+    database: "reserva_hotel", //Nome do banco de dados
+});//Fim
 
 // Avisa se a conexão foi bem-sucedida
 connection.connect((err) => {
@@ -61,6 +61,49 @@ app.get("/options", (req, res) => {
         res.redirect('/loginPage');
     }
 });
+
+
+//Rota para renderizar a pagina atualizar.ejs
+app.get("/atualizar", (req, res) => {
+    res.render("atualizar.ejs"); //Renderiza a pagina atualizar.ejs
+});//Fim
+
+//Rota para fazer a atualização dos dados do usuario
+app.post("/atualizarConta", (req, res) => {
+    const { nome_completo, user_name, senha, idade } = req.body; //Pega os dados inseridos na pagina atualizar.ejs
+
+    //Faz o update dos dados
+    connection.query(`UPDATE CLIENTE SET nome_completo = "${nome_completo}", senha = "${senha}", idade = "${idade}" WHERE user_name = "${user_name}"`, (err, results) => {
+        if(err) throw err;
+
+        res.render("login"); //Depois de atualizar os dados o usuario é redirecionado para a pagina de login
+    });
+});//Fim
+
+//Rota para renderizar a pagina de deletar conta
+app.get("/deletar", (req, res) =>{
+    res.render("deletar.ejs"); //renderiza a pagina deletar.ejs
+});
+
+//Rota para deletar conta
+app.post("/deletarconta", (req, res) => {
+    const { user_name, senha }  = req.body;
+
+    console.log(user_name);
+    console.log(senha);
+
+        //Verifica se senha é realmente a senha do usuario
+        if(result.affectedRows > 0 || senha === senhaenha){    
+            //Deleta a conta do cliente
+            connection.query('DELETE FROM CLIENTE_CONTA WHERE user_name = ? AND senha = ?', [user_name, senha], (errCompra, resultCompra) => {
+                if (errCompra) throw errCompra;
+
+                res.render("index");
+            });
+        }else{
+            res.send('Credenciais inválidas ou a conta não foi encontrada.'); //Envia uma aviso de que algun dado está invalido
+        }
+    });
 
 // Rota para a página de cadastro
 app.post('/cadastro', (req, res) => {

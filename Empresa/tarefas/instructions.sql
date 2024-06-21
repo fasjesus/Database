@@ -120,5 +120,47 @@ GROUP BY
     pedidos.numped, clientes.nome, produtos.descr
 WITH ROLLUP;
 
+-- sem rollup ---
+
+SELECT 
+    pedidos.numped AS NumeroPedidos,
+    clientes.nome AS NomeCliente,
+    produtos.descr AS DescricaoProduto,
+    FORMAT(SUM(pedidos.frete), 2) AS Frete,
+    FORMAT(SUM(produtos.preco), 2) AS PrecoProduto,
+    FORMAT(SUM(produtos.preco + pedidos.frete), 2) AS Total
+FROM 
+    pedidos
+JOIN 
+    detalhesped ON pedidos.numped = detalhesped.numped
+JOIN 
+    produtos ON detalhesped.codprod = produtos.codprod
+JOIN 
+    clientes ON pedidos.codcli = clientes.codcli
+WHERE
+    produtos.preco > 50
+GROUP BY 
+    pedidos.numped, clientes.nome, produtos.descr
+
+UNION ALL
+
+SELECT 
+    NULL AS NumeroPedidos,
+    NULL AS NomeCliente,
+    NULL AS DescricaoProduto,
+    FORMAT(SUM(pedidos.frete), 2) AS Frete,
+    FORMAT(SUM(produtos.preco), 2) AS PrecoProduto,
+    FORMAT(SUM(produtos.preco + pedidos.frete), 2) AS Total
+FROM 
+    pedidos
+JOIN 
+    detalhesped ON pedidos.numped = detalhesped.numped
+JOIN 
+    produtos ON detalhesped.codprod = produtos.codprod
+JOIN 
+    clientes ON pedidos.codcli = clientes.codcli
+WHERE
+    produtos.preco > 50;
+
 
 

@@ -1,3 +1,9 @@
+use dw_comercial;
+
+SELECT IFNULL(year,"Total") as year, SUM(profit)
+FROM sales
+GROUP BY year WITH ROLLUP;
+
 -- Índices para tabelas despejadas
 --
 
