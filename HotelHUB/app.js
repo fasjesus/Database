@@ -24,7 +24,7 @@ let clienteNome = null; // Guarda o nome do cliente
 const connection = mysql.createConnection({
     host: "localhost", //Nome do servidor
     user: "root", //Usuario do servidor
-    password: "", //Senha do servidor
+    password: "senia", //Senha do servidor
     database: "reserva_hotel", //Nome do banco de dados
 });//Fim
 
@@ -156,6 +156,30 @@ app.post('/login', (req, res) => {
         }
     );
 });
+
+// Rota para a página de cadastrar quarto
+app.get('/upRoom', (req, res) => {
+    res.render('upRoom');
+});
+
+// Rota para tratar os dados do formulário de cadastro de quarto
+app.post('/upRoom', (req, res) => {
+    const { NumeroQuarto, TipoQuarto, Preco, Status } = req.body; // Extrai os dados do formulário
+
+    // Define o objeto quarto com os dados do formulário
+    const quarto = { NumeroQuarto, TipoQuarto, Preco, Status };
+
+    // Insere os dados do quarto no banco de dados
+    connection.query('INSERT INTO QUARTO SET ?', quarto, (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Erro ao cadastrar quarto. Por favor, tente novamente.');
+            return;
+        }
+        res.redirect('/options'); // Redireciona para a página de opções após o cadastro bem-sucedido
+    });
+});
+
 
 // Inicia o servidor
 app.listen(port, () => {
