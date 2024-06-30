@@ -111,3 +111,73 @@ WHERE QUARTO.Status = "Disponível";
 -- SELECT * FROM CLIENTE;
 -- SELECT * FROM QUARTO;
 -- SELECT * FROM RESERVA;
+
+-- Passo 1: Remover a chave estrangeira
+ALTER TABLE reserva DROP FOREIGN KEY reserva_ibfk_2;
+
+-- Passo 2: Remover a coluna
+ALTER TABLE reserva DROP COLUMN FK_cpf;
+
+ALTER TABLE reserva
+ADD COLUMN FK_Email VARCHAR(100);
+
+-- Criar um índice único na coluna 'email' da tabela 'cliente'
+ALTER TABLE cliente
+ADD UNIQUE (email);
+
+-- Adicionar a chave estrangeira na tabela 'reserva'
+ALTER TABLE reserva
+ADD CONSTRAINT fk_email
+FOREIGN KEY (FK_Email) REFERENCES cliente(email);
+
+DELETE FROM quarto WHERE Id_quarto = 10;
+DELETE FROM quarto WHERE Id_quarto = 11;
+
+CREATE TABLE metodo_pagamento (
+    id_metodoPag INT AUTO_INCREMENT PRIMARY KEY,
+    nome_metodoPag VARCHAR(100) NOT NULL
+);
+
+ALTER TABLE reserva 
+ADD COLUMN MetodoPagamento VARCHAR(255);
+
+==================================================================
+
+SELECT MIN(Id_quarto) AS Id_quarto, NumeroQuarto, TipoQuarto
+FROM QUARTO
+GROUP BY NumeroQuarto, TipoQuarto
+HAVING COUNT(*) > 1;
+
+SELECT *
+FROM QUARTO
+WHERE (NumeroQuarto, TipoQuarto) IN (
+    SELECT NumeroQuarto, TipoQuarto
+    FROM QUARTO
+    GROUP BY NumeroQuarto, TipoQuarto
+    HAVING COUNT(*) > 1
+)
+ORDER BY NumeroQuarto, TipoQuarto, Id_quarto;
+
+SET SESSION sql_mode = '';
+
+SELECT Id_quarto, NumeroQuarto, TipoQuarto, COUNT(*)
+FROM QUARTO
+GROUP BY NumeroQuarto, TipoQuarto
+HAVING COUNT(*) > 1;
+
+SET SESSION sql_mode = 'ONLY_FULL_GROUP_BY';
+
+CREATE TEMPORARY TABLE temp_quartos AS
+SELECT MIN(Id_quarto) AS Id_quarto
+FROM QUARTO
+GROUP BY NumeroQuarto, TipoQuarto;
+
+SET SQL_SAFE_UPDATES = 0;
+
+DELETE FROM QUARTO
+WHERE Id_quarto NOT IN (SELECT Id_quarto FROM temp_quartos);
+
+DELETE q1
+FROM QUARTO q1
+LEFT JOIN temp_quartos tq ON q1.Id_quarto = tq.Id_quarto
+WHERE tq.Id_quarto IS NULL;

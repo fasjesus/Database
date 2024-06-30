@@ -2,7 +2,7 @@
     Projeto de Banco de Dados feito por Brenda Castro da Silva e Flavia Alessandra de Jesus.
 
     Para iniciar o npm use este comando no terminal na pasta do seu projeto: npm init -y
-    Para instalar as dependências necessárias use o comando no terminal na pasta em que seu projeto está: npm install express ejs mysql2 express-session body-parser
+    Para instalar as dependências necessárias use o comando no terminal na pasta em que seu projeto está: npm install express ejs mysql2
     Para executar esse código digite no terminal o comando: node app.js
     Para ver o resultado, vá no seu navegador e entre no link: http://localhost:3000
     Para finalizar clique em ctrl + c no terminal
@@ -12,17 +12,21 @@
 const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
-const session = require('express-session');
 const app = express();
 const port = 3000; // Porta que será usada
 
+let clienteEmail = null; // Variável que guarda o email do cliente que está usando a conta
+let clienteCPF = null; // Guarda o CPF do cliente
+let clienteSenha = null; // Guarda a senha do cliente
+let clienteNome = null; // Guarda o nome do cliente
+
 // Configura o banco de dados MySQL
 const connection = mysql.createConnection({
-    host: "localhost", // Nome do servidor
-    user: "root", // Usuário do servidor
-    password: "senia", // Senha do servidor
-    database: "reserva_hotel", // Nome do banco de dados
-});
+    host: "localhost", //Nome do servidor
+    user: "root", //Usuario do servidor
+    password: "senia", //Senha do servidor
+    database: "reserva_hotel", //Nome do banco de dados
+});//Fim
 
 // Avisa se a conexão foi bem-sucedida
 connection.connect((err) => {
@@ -38,14 +42,6 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// Configuração da sessão
-app.use(session({
-    secret: 'secreta', // Altere para uma chave secreta adequada
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Para desenvolvimento; use true com HTTPS em produção
-}));
-
 // Rotas
 // Rota principal chama index.ejs
 app.get('/', (req, res) => {
@@ -59,8 +55,8 @@ app.get("/loginPage", (req, res) => {
 
 // Rota para a página de opções
 app.get("/options", (req, res) => {
-    if (req.session.nome) {
-        res.render("options.ejs", { user_name: req.session.nome }); // Renderiza a página options.ejs passando o nome do usuário
+    if (clienteNome) {
+        res.render("options.ejs", { user_name: clienteNome }); // Renderiza a página options.ejs passando o nome do usuário
     } else {
         res.redirect('/loginPage');
     }
@@ -68,7 +64,7 @@ app.get("/options", (req, res) => {
 
 // Rota para renderizar a página de lista de reservas
 app.get("/reserveList", (req, res) => {
-    const { status, tipo } = req.query;
+    const { status, tipo, message } = req.query;
 
     let query = "SELECT * FROM QUARTO";
     let queryParams = [];
@@ -94,56 +90,48 @@ app.get("/reserveList", (req, res) => {
     });
 });
 
-// Rota para renderizar a página atualizar.ejs
+
+//Rota para renderizar a pagina atualizar.ejs
 app.get("/update", (req, res) => {
-    if (!req.session.email) {
-        return res.redirect('/loginPage'); // Redireciona para login se não autenticado
-    }
-    res.render("update.ejs"); // Renderiza a página atualizar.ejs
-});
+    res.render("update.ejs"); //Renderiza a pagina atualizar.ejs
+});//Fim
 
-// Rota para fazer a atualização dos dados do usuário
+//Rota para fazer a atualização dos dados do usuario
 app.post("/atualizarConta", (req, res) => {
-    const { nome_completo, user_name, senha, idade } = req.body; // Pega os dados inseridos na página atualizar.ejs
+    const { nome_completo, user_name, senha, idade } = req.body; //Pega os dados inseridos na pagina atualizar.ejs
 
-    // Faz o update dos dados
-    connection.query(
-        'UPDATE CLIENTE SET nome_completo = ?, senha = ?, idade = ? WHERE user_name = ?',
-        [nome_completo, senha, idade, user_name],
-        (err, results) => {
-            if (err) throw err;
-            res.render("login.ejs"); // Depois de atualizar os dados o usuário é redirecionado para a página de login
-        }
-    );
+    //Faz o update dos dados
+    connection.query(`UPDATE CLIENTE SET nome_completo = "${nome_completo}", senha = "${senha}", idade = "${idade}" WHERE user_name = "${user_name}"`, (err, results) => {
+        if(err) throw err;
+
+        res.render("login"); //Depois de atualizar os dados o usuario é redirecionado para a pagina de login
+    });
+});//Fim
+
+//Rota para renderizar a pagina de deletar conta
+app.get("/delete", (req, res) =>{
+    res.render("delete.ejs"); //renderiza a pagina deletar.ejs
 });
 
-// Rota para renderizar a página de deletar conta
-app.get("/delete", (req, res) => {
-    if (!req.session.email) {
-        return res.redirect('/loginPage'); // Redireciona para login se não autenticado
-    }
-    res.render("delete.ejs"); // Renderiza a página deletar.ejs
-});
-
-// Rota para deletar conta
+//Rota para deletar conta
 app.post("/deletarconta", (req, res) => {
-    const { user_name, senha } = req.body;
+    const { user_name, senha }  = req.body;
 
-    // Verifica se a senha é realmente a senha do usuário
-    connection.query(
-        'DELETE FROM CLIENTE WHERE user_name = ? AND senha = ?',
-        [user_name, senha],
-        (err, result) => {
-            if (err) throw err;
+    console.log(user_name);
+    console.log(senha);
 
-            if (result.affectedRows > 0) {
-                res.redirect('/'); // Redireciona para a página inicial após a exclusão
-            } else {
-                res.send('Credenciais inválidas ou a conta não foi encontrada.'); // Envia um aviso se algum dado está inválido
-            }
+        //Verifica se senha é realmente a senha do usuario
+        if(result.affectedRows > 0 || senha === senhaenha){    
+            //Deleta a conta do cliente
+            connection.query('DELETE FROM CLIENTE_CONTA WHERE user_name = ? AND senha = ?', [user_name, senha], (errCompra, resultCompra) => {
+                if (errCompra) throw errCompra;
+
+                res.render("index");
+            });
+        }else{
+            res.send('Credenciais inválidas ou a conta não foi encontrada.'); //Envia uma aviso de que algun dado está invalido
         }
-    );
-});
+    });
 
 // Rota para a página de cadastro
 app.post('/cadastro', (req, res) => {
@@ -176,6 +164,8 @@ app.post('/cadastro', (req, res) => {
 // Rota para a página de fazer login
 app.post('/login', (req, res) => {
     const { email, senha } = req.body; // Traz do formulário o email e a senha do usuário
+    clienteEmail = email; // Salva o email do usuário
+    clienteSenha = senha;
 
     // Comando select para saber se as informações que o usuário digitou estão no banco de dados
     connection.query(
@@ -186,8 +176,7 @@ app.post('/login', (req, res) => {
 
             // Se estiver certo será redirecionado para a página de opções
             if (results.length > 0) {
-                req.session.email = email; // Armazenar o e-mail do cliente na sessão
-                req.session.nome = results[0].nome_completo; // Opcional: armazenar o nome completo
+                clienteNome = results[0].nome_completo; // Salva o nome do usuário
                 res.redirect('/options');
             } else {
                 res.send('Credenciais inválidas!');
@@ -198,9 +187,6 @@ app.post('/login', (req, res) => {
 
 // Rota para a página de cadastrar quarto
 app.get('/upRoom', (req, res) => {
-    if (!req.session.email) {
-        return res.redirect('/loginPage'); // Redireciona para login se não autenticado
-    }
     res.render('upRoom');
 });
 
@@ -222,6 +208,7 @@ app.post('/upRoom', (req, res) => {
     });
 });
 
+
 // Rota para a página de pagamento
 app.get('/payment', (req, res) => {
     const { numeroQuarto, TipoQuarto, Preco } = req.query;
@@ -229,62 +216,63 @@ app.get('/payment', (req, res) => {
     res.render('payment', { numeroQuarto, TipoQuarto, Preco });
 });
 
+
 // Rota para finalizar a reserva
 app.post('/finalizar-reserva', (req, res) => {
     // Dados do formulário
-    const { NumeroQuarto, TipoQuarto, Preco, DataCheckIn, DataCheckOut, metodoPagamento } = req.body;
+    const { numeroQuarto, TipoQuarto, Preco, DataCheckIn, DataCheckOut, FK_Email, metodoPagamento } = req.body;
 
-    // Passo 1: Obter o ID do quarto
-    connection.query(
-        'SELECT Id_quarto FROM QUARTO WHERE NumeroQuarto = ? AND TipoQuarto = ? AND Status = "Disponível"',
-        [NumeroQuarto, TipoQuarto],
-        (err, results) => {
-            if (err) {
-                console.error('Erro ao obter ID do quarto:', err);
-                res.status(500).send('Erro ao finalizar a reserva');
-                return;
-            }
+    // Verifica se Preço é um número válido
+    const preco = parseFloat(Preco);
+    if (isNaN(preco)) {
+        console.error('Preço inválido:', Preco);
+        res.status(400).send('Preço inválido');
+        return;
+    } 
+    // Dados do quarto
+    const quarto = {
+        NumeroQuarto: numeroQuarto,
+        TipoQuarto: TipoQuarto,
+        Preco: Preco,
+        Status: 'Ocupado'
+    };
 
-            if (results.length === 0) {
-                // Nenhum quarto disponível encontrado
-                res.status(400).send('Quarto não disponível');
-                return;
-            }
+    // Dados da reserva
+    const reserva = {
+        FK_Id_quarto: null, // Será definido após a inserção do quarto
+        FK_Email: FK_Email,
+        DataCheckIn: DataCheckIn,
+        DataCheckOut: DataCheckOut,
+        MetodoPagamento: metodoPagamento // Adicione se for necessário
+    };
 
-            const idQuarto = results[0].Id_quarto;
-
-            // Passo 2: Atualizar o status do quarto para 'Ocupado'
-            connection.query(
-                'UPDATE QUARTO SET Status = ? WHERE Id_quarto = ?',
-                ['Ocupado', idQuarto],
-                (err2) => {
-                    if (err2) {
-                        console.error('Erro ao atualizar o status do quarto:', err2);
-                        res.status(500).send('Erro ao atualizar o status do quarto');
-                        return;
-                    }
-
-                    // Passo 3: Inserir dados na tabela 'reserva'
-                    connection.query(
-                        'INSERT INTO RESERVA (FK_Id_quarto, DataCheckIn, DataCheckOut, FK_Email, MetodoPagamento) VALUES (?, ?, ?, ?, ?)',
-                        [idQuarto, DataCheckIn, DataCheckOut, req.session.email, metodoPagamento],
-                        (err3) => {
-                            if (err3) {
-                                console.error('Erro ao inserir reserva:', err3);
-                                res.status(500).send('Erro ao finalizar a reserva');
-                                return;
-                            }
-
-                            // Sucesso na inserção
-                            res.status(200).send('Reserva finalizada com sucesso');
-                        }
-                    );
-                }
-            );
+    // Inserir dados na tabela 'quarto'
+    connection.query('INSERT INTO quarto SET ?', quarto, (err, resultQuarto) => {
+        if (err) {
+            console.error('Erro ao inserir quarto:', err);
+            res.status(500).send('Erro ao finalizar a reserva (quarto)');
+            return;
         }
-    );
-});
 
+        // Obter o ID do quarto inserido
+        const idQuartoInserido = resultQuarto.insertId;
+
+        // Atualizar o ID do quarto na reserva
+        reserva.FK_Id_quarto = idQuartoInserido;
+
+        // Inserir dados na tabela 'reserva'
+        connection.query('INSERT INTO reserva SET ?', reserva, (err, resultReserva) => {
+            if (err) {
+                console.error('Erro ao inserir reserva:', err);
+                res.status(500).send('Erro ao finalizar a reserva (reserva)');
+                return;
+            }
+
+            // Sucesso na inserção
+            res.status(200).send('Reserva finalizada com sucesso');
+        });
+    });
+});
 
 
 // Rota para a página de histórico de reservas
@@ -297,19 +285,17 @@ app.get('/historic', (req, res) => {
                       FROM quarto
                       JOIN reserva ON quarto.Id_quarto = reserva.FK_Id_quarto
                       JOIN cliente ON cliente.email = reserva.FK_Email
-                      WHERE cliente.email = ?`, [clienteEmail], (err2, reservas) => {
+                      WHERE cliente.email = ?`, [clienteEmail], (err2, total) => {
         if (err2) {
             console.error('Não contem reservas feitas:', err2);
             res.status(500).send('Não existem reservas para serem exibidas');
             return;
         }
-        
-        // Calcular o total gasto
-        const totalGasto = reservas.reduce((sum, reserva) => sum + parseFloat(reserva.Preco), 0);
-
-        res.render('historic', { reservas, totalGasto }); // Passa o totalGasto para a view
+        console.log(total);
+        res.render('historic', { reservas: total }); // Renderiza a página historico.ejs com o nome correto da variável
     });
 });
+
 
 
 // Inicia o servidor
