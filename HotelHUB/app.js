@@ -46,6 +46,9 @@ app.use(session({
     cookie: { secure: false } // Para desenvolvimento; use true com HTTPS em produção
 }));
 
+//INCLUIR PASTA PUBLIC o projeto
+app.use(express.static('public'));
+
 // Rotas
 // Rota principal chama index.ejs
 app.get('/', (req, res) => {
