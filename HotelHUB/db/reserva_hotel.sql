@@ -181,3 +181,50 @@ DELETE q1
 FROM QUARTO q1
 LEFT JOIN temp_quartos tq ON q1.Id_quarto = tq.Id_quarto
 WHERE tq.Id_quarto IS NULL;
+
+ -- ==================================== USADO PARA REMOVER AS RESERVAS DEFEITUOSAS FEITAS ANTERIORMENTE ====================================
+ --
+ use reserva_hotel;
+SELECT * FROM RESERVA
+WHERE 
+    FK_Id_quarto IS NULL OR
+    DataCheckIn IS NULL OR
+    DataCheckOut IS NULL OR
+    FK_Email IS NULL OR
+    MetodoPagamento IS NULL;
+
+-- Desativa o modo seguro temporariamente
+SET SQL_SAFE_UPDATES = 0;
+
+-- Executa a exclusão
+DELETE FROM RESERVA
+WHERE 
+    FK_Id_quarto IS NULL OR
+    DataCheckIn IS NULL OR
+    DataCheckOut IS NULL OR
+    FK_Email IS NULL OR
+    MetodoPagamento IS NULL;
+
+-- Reativa o modo seguro
+SET SQL_SAFE_UPDATES = 1;
+
+select * from reserva;
+select * from quarto;
+
+-- ===================================================== USADO PARA EVITAR QUARTOS OCUPADOS SEM RESERVA ================================
+--
+use reserva_hotel;
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE QUARTO 
+SET Status = 'Disponível' 
+WHERE Id_quarto NOT IN (
+    SELECT FK_Id_quarto 
+    FROM RESERVA
+);
+
+SET SQL_SAFE_UPDATES = 1;
+
+select * from reserva;
+select * from quarto;

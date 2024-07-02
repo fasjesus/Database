@@ -347,41 +347,48 @@ app.post('/finalizar-reserva', (req, res) => {
 
 
 
-// Rota para a página de histórico de reservas
 app.get('/historic', (req, res) => {
-    const clienteEmail = req.query.email; 
+    const clienteEmail = req.session.email; // Obtém o e-mail da sessão
 
-    // Faz o select das reservas que o cliente fez com ROLLUP para calcular o total gasto
-    connection.query(`
+    // Verifica se clienteEmail não está vazio ou indefinido
+    if (!clienteEmail) {
+        return res.status(400).send('Email do cliente não fornecido.');
+    }
+
+    // Consulta SQL com interpolação de strings
+    const query = `
         SELECT 
             quarto.NumeroQuarto, 
             quarto.TipoQuarto, 
             quarto.Preco, 
             reserva.DataCheckIn, 
-            reserva.DataCheckOut,
-            IFNULL(SUM(quarto.Preco), 0) AS totalGasto
+            reserva.DataCheckOut
         FROM 
-            quarto
-            JOIN reserva ON quarto.Id_quarto = reserva.FK_Id_quarto
+            reserva
+            JOIN quarto ON quarto.Id_quarto = reserva.FK_Id_quarto
             JOIN cliente ON cliente.email = reserva.FK_Email
         WHERE 
-            cliente.email = ?
-        GROUP BY 
-            quarto.NumeroQuarto, quarto.TipoQuarto, quarto.Preco, reserva.DataCheckIn, reserva.DataCheckOut WITH ROLLUP
-    `, [clienteEmail], (err, reservas) => {
+            cliente.email = '${clienteEmail}'
+    `;
+
+    // Execute a consulta
+    connection.query(query, (err, reservas) => {
         if (err) {
             console.error('Erro ao obter reservas:', err);
-            res.status(500).send('Não existem reservas para serem exibidas');
-            return;
+            return res.status(500).send('Erro ao obter reservas');
         }
 
-        // Extraindo o total gasto
-        const totalGasto = reservas.find(reserva => reserva.NumeroQuarto === null)?.totalGasto || 0;
-        const reservasList = reservas.filter(reserva => reserva.NumeroQuarto !== null);
+        // Verifica se reservas foram recuperadas
+        console.log('Reservas:', reservas);
 
-        res.render('historic', { reservas: reservasList, totalGasto }); // Passa o totalGasto para a view
+        // Calcula o total gasto
+        const totalGasto = reservas.reduce((total, reserva) => total + parseFloat(reserva.Preco), 0);
+
+        // Envia os dados para a view
+        res.render('historic', { reservas, totalGasto });
     });
 });
+
 
 
 
