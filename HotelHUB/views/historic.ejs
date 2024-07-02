@@ -78,10 +78,14 @@
                         </tr>
                     <% }); %>
                     
-                    <!-- Mostrar o total gasto -->
+                     <!-- Mostrar o total gasto e o total de reservas -->
                     <tr>
                         <td colspan="4"><strong>Total Gasto</strong></td>
-                        <td><%= totalGasto.toFixed(2) %></td>
+                        <td>R$<%= parseFloat(totalGasto).toFixed(2) %></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><strong>Total de Reservas</strong></td>
+                        <td><%= totalReservas %></td>
                     </tr>
                 </tbody>
             </table>

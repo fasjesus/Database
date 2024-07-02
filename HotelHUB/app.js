@@ -211,7 +211,7 @@ app.get("/reserveList", (req, res) => {
     }
     // Ordena numericamente por NumeroQuarto
     query += " ORDER BY QUARTO.NumeroQuarto";
-    
+
     console.log('Query:', query); // Log da consulta SQL
     console.log('Query Params:', queryParams); // Log dos parâmetros da consulta
 
@@ -357,14 +357,21 @@ app.get('/historic', (req, res) => {
         return res.status(400).send('Email do cliente não fornecido.');
     }
 
-    // Consulta SQL com interpolação de strings
+    // Consulta SQL com funções agregadas
     const query = `
         SELECT 
             quarto.NumeroQuarto, 
             quarto.TipoQuarto, 
             quarto.Preco, 
             reserva.DataCheckIn, 
-            reserva.DataCheckOut
+            reserva.DataCheckOut,
+            (SELECT COUNT(*) FROM reserva
+                JOIN cliente ON cliente.email = reserva.FK_Email
+                WHERE cliente.email = '${clienteEmail}') AS totalReservas,
+            (SELECT SUM(quarto.Preco) FROM reserva
+                JOIN quarto ON quarto.Id_quarto = reserva.FK_Id_quarto
+                JOIN cliente ON cliente.email = reserva.FK_Email
+                WHERE cliente.email = '${clienteEmail}') AS totalGasto
         FROM 
             reserva
             JOIN quarto ON quarto.Id_quarto = reserva.FK_Id_quarto
@@ -374,20 +381,28 @@ app.get('/historic', (req, res) => {
     `;
 
     // Execute a consulta
-    connection.query(query, (err, reservas) => {
+    connection.query(query, [clienteEmail, clienteEmail, clienteEmail], (err, results) => {
         if (err) {
             console.error('Erro ao obter reservas:', err);
             return res.status(500).send('Erro ao obter reservas');
         }
 
-        // Verifica se reservas foram recuperadas
-        console.log('Reservas:', reservas);
+        // Verifica se resultados foram recuperados
+        console.log('Resultados:', results);
 
-        // Calcula o total gasto
-        const totalGasto = reservas.reduce((total, reserva) => total + parseFloat(reserva.Preco), 0);
+        // Extraímos as reservas e as informações agregadas dos resultados
+        const reservas = results.map(result => ({
+            NumeroQuarto: result.NumeroQuarto,
+            TipoQuarto: result.TipoQuarto,
+            Preco: result.Preco,
+            DataCheckIn: result.DataCheckIn,
+            DataCheckOut: result.DataCheckOut
+        }));
+        const totalGasto = parseFloat(results[0]?.totalGasto) || 0;
+        const totalReservas = results[0]?.totalReservas || 0;
 
         // Envia os dados para a view
-        res.render('historic', { reservas, totalGasto });
+        res.render('historic', { reservas, totalGasto, totalReservas });
     });
 });
 
