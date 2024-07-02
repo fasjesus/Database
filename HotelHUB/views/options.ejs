@@ -9,6 +9,18 @@
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            width: 100%;
         }
 
         .main {
@@ -16,7 +28,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin-top: 50px;
+            width: 100%;
             position: relative;
         }
 
@@ -41,7 +53,8 @@
 
         .title {
             font-weight: 700;
-            font-size: 50px;
+            font-size: 80px;
+            margin-bottom: 20px;
         }
 
         .box {
@@ -60,42 +73,57 @@
         .box a:hover {
             font-size: 18px;
         }
-        .voltar{
+
+        .voltar {
             width: 50%;
             padding: 6px;
             font-size: 1.0em;
             background-color: #4c28ee;
-            color:white;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin-left: 30px;      
+            margin-left: 30px;
         }
-        
+
+        .side-image {
+            width: 80%;
+            height: auto;
+            max-width: 300px; /* Define a largura máxima desejada para a imagem */
+        }
     </style>
 </head>
 <body>
-    <div class="main">
-        <div class="welcome">
-            <h2>Olá, <%= user_name %>!</h2>
-        </div>
-        <div class="title">
-            <h1>Opções</h1>
-        </div>
-        <div class="options">
-            <div class="mb-3 box">
-                <a href="reserveList">Lista de Reservas</a> 
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 d-flex justify-content-center align-items-center">
+                <img src="/hotelHUB.jpeg" alt="HotelHub" class="side-image">
             </div>
-            <div class="mb-3 box">
-                <a href="historic">Histórico de Reservas</a> 
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <div class="main">
+                    <div class="title">
+                        <h1>Olá, <%= user_name %>!</h1>
+                    </div>
+                    <div class="options">
+                        <div class="mb-3 box" style="background-color: #8d5bf3;">
+                            <a href="reserveList">Lista de Reservas</a> 
+                        </div>
+                        <div class="mb-3 box" style="background-color: #e4d04a;">
+                            <a href="historic">Histórico de Reservas</a> 
+                        </div>
+                        <div class="mb-3 box">
+                            <a href="update">Atualizar Informações</a> 
+                        </div>
+                        <div class="mb-3 box" style="background-color: #ee4b66;">
+                            <a href="delete">Deletar Conta</a>
+                        </div>
+                        <button type="button" class="voltar" id="back" style="background-color: #528ee9;">Voltar</button>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3 box">
-                <a href="update">Atualizar Informações</a> 
+            <div class="col-md-3 d-flex justify-content-center align-items-center">
+                <img src="/hotelHUB.jpeg" alt="HotelHub" class="side-image">
             </div>
-            <div class="mb-3 box">
-                <a href="delete">Deletar Conta</a>
-            </div>
-            <button type="button" class="voltar" id="back">Voltar</button>
         </div>
     </div>
     <script>
