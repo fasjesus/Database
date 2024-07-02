@@ -209,7 +209,9 @@ app.get("/reserveList", (req, res) => {
             queryParams.push(tipo);
         }
     }
-
+    // Ordena numericamente por NumeroQuarto
+    query += " ORDER BY QUARTO.NumeroQuarto";
+    
     console.log('Query:', query); // Log da consulta SQL
     console.log('Query Params:', queryParams); // Log dos parâmetros da consulta
 

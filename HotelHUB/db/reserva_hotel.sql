@@ -208,8 +208,6 @@ WHERE
 -- Reativa o modo seguro
 SET SQL_SAFE_UPDATES = 1;
 
-select * from reserva;
-select * from quarto;
 
 -- ===================================================== USADO PARA EVITAR QUARTOS OCUPADOS SEM RESERVA ================================
 --
@@ -226,5 +224,7 @@ WHERE Id_quarto NOT IN (
 
 SET SQL_SAFE_UPDATES = 1;
 
-select * from reserva;
-select * from quarto;
+
+-- ============================================= USADO PARA CONSEGUIR ORDENAR OS QUARTOS COM ORDER BY PELO NÚMERO ================================
+--
+ALTER TABLE QUARTO MODIFY COLUMN NumeroQuarto INT;
