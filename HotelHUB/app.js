@@ -77,6 +77,7 @@ app.get("/options", (req, res) => {
 
 // Rota para renderizar a página atualizar.ejs
 app.get("/update", (req, res) => {
+    
     if (!req.session.email) {
         return res.redirect('/loginPage'); // Redireciona para login se não autenticado
     }
@@ -533,6 +534,7 @@ app.get('/max', (req, res) => {
         res.render('relatorio', { resultados });
     });
 });
+
 app.get('/min', (req, res) => {
     const query = `
         SELECT 
