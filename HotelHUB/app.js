@@ -228,6 +228,7 @@ app.get("/reserveList", (req, res) => {
     });
 });
 
+
 // Rota para a página de pagamento
 app.get('/payment', (req, res) => {
     const { NumeroQuarto, TipoQuarto } = req.query;
@@ -310,7 +311,7 @@ app.post('/finalizar-reserva', (req, res) => {
                         res.status(500).send('Erro ao atualizar o status do quarto');
                         return;
                     }
-                    
+
                     // Consultar se o método de pagamento já existe
                     connection.query(
                         'SELECT id_metodoPag FROM metodo_pagamento WHERE nome_metodoPag = ?',
@@ -365,6 +366,7 @@ app.post('/finalizar-reserva', (req, res) => {
                     console.log('Reserva inserida com sucesso');
                     res.status(200).send('Reserva finalizada com sucesso');
 
+
                     // Atualizar o status do quarto para "Disponível" após o checkout
                     const checkOutDate = new Date(DataCheckOut);
                     setTimeout(() => {
@@ -380,6 +382,9 @@ app.post('/finalizar-reserva', (req, res) => {
                             }
                         );
                     }, checkOutDate.getTime() - new Date().getTime());
+
+                
+                    
                 }
             }
         );
@@ -466,6 +471,101 @@ app.get('/historic', (req, res) => {
 });
 
 
+app.get('/relatorio', (req, res) => {
+
+    let query = `
+        SELECT 
+            c.user_name AS UserName,
+            mp.nome_metodoPag AS MetodoPagamento,
+            MAX(q.Preco) AS ValorMaximo,
+            MIN(q.Preco) AS ValorMinimo,
+            SUM(q.Preco) AS ValorTotal
+        FROM 
+            reserva r
+            JOIN quarto q ON r.FK_Id_quarto = q.Id_quarto
+            JOIN metodo_pagamento mp ON r.FK_Id_pagamento = mp.id_metodoPag
+            JOIN cliente c ON r.FK_Email = c.email
+        GROUP BY 
+            c.user_name, mp.nome_metodoPag
+    `;
+
+
+    connection.query(query, (err, resultados) => {
+        if (err) {
+            console.error('Erro ao executar consulta:', err);
+            res.status(500).send('Erro ao obter relatório');
+            return;
+        }
+        res.render('relatorio', { resultados }); 
+    });
+});
+
+app.get('/max', (req, res) => {
+    const query = `
+        SELECT 
+            c.user_name AS UserName,
+            mp.nome_metodoPag AS MetodoPagamento,
+            MAX(q.Preco) AS ValorMaximo,
+            SUM(q.Preco) AS ValorTotal
+        FROM 
+            reserva r
+            JOIN quarto q ON r.FK_Id_quarto = q.Id_quarto
+            JOIN metodo_pagamento mp ON r.FK_Id_pagamento = mp.id_metodoPag
+            JOIN cliente c ON r.FK_Email = c.email
+        GROUP BY 
+            c.user_name, mp.nome_metodoPag
+        HAVING ValorTotal = (
+            SELECT MAX(Total) FROM (
+                SELECT SUM(q.Preco) AS Total
+                FROM reserva r
+                JOIN quarto q ON r.FK_Id_quarto = q.Id_quarto
+                GROUP BY r.FK_Email, r.FK_Id_pagamento
+            ) AS MaxTotal
+        );
+    `;
+
+    connection.query(query, (err, resultados) => {
+        if (err) {
+            console.error('Erro ao executar consulta:', err);
+            res.status(500).send('Erro ao obter relatório');
+            return;
+        }
+        res.render('relatorio', { resultados });
+    });
+});
+app.get('/min', (req, res) => {
+    const query = `
+        SELECT 
+            c.user_name AS UserName,
+            mp.nome_metodoPag AS MetodoPagamento,
+            MIN(q.Preco) AS ValorMinimo,
+            SUM(q.Preco) AS ValorTotal
+        FROM 
+            reserva r
+            JOIN quarto q ON r.FK_Id_quarto = q.Id_quarto
+            JOIN metodo_pagamento mp ON r.FK_Id_pagamento = mp.id_metodoPag
+            JOIN cliente c ON r.FK_Email = c.email
+        GROUP BY 
+            c.user_name, mp.nome_metodoPag
+        HAVING ValorTotal = (
+            SELECT MIN(Total) FROM (
+                SELECT SUM(q.Preco) AS Total
+                FROM reserva r
+                JOIN quarto q ON r.FK_Id_quarto = q.Id_quarto
+                GROUP BY r.FK_Email, r.FK_Id_pagamento
+            ) AS MinTotal
+        );
+    `;
+
+    connection.query(query, (err, resultados) => {
+        if (err) {
+            console.error('Erro ao executar consulta:', err);
+            res.status(500).send('Erro ao obter relatório');
+            return;
+        }
+        res.render('relatorio', { resultados });
+    });
+});
 
 
 // Inicia o servidor

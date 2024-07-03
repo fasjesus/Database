@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório por Método de Pagamento</title>
+    <style>
+         body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        h1{
+            margin-left: 410px;
+            margin-top: 100px;
+        }
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            border-color: black;
+            margin-left: 150px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid black;
+            
+        }
+        th {
+            background-color: #f2f2f2;
+            border-color: black;
+        }
+        .voltar{
+            width: 20%;
+            padding: 6px;
+            font-size: 1.0em;
+            background-color: #4c28ee;
+            color:white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            margin-left: 600px;      
+        }
+    .relatorio{
+        display: flex;
+            flex-direction: column;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 80%;
+            border-radius: 10px;
+            background-color: #f5f5f5;
+            margin-left: 150px;
+    }
+    .link-container {
+        text-align: center; /* Alinha os links ao centro */
+    }
+
+    .link-container a {
+        display: inline-block; /* Faz com que os links fiquem lado a lado */
+        margin: 5px; /* Espaçamento entre os links */
+    }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Máximo e Mínimo por Método de Pagamento</h1>
+    <div class="relatorio">
+        <div class="link-container">
+        <a href="/max">Ver Máximo Valor Total</a>
+        <a href="/min">Ver Mínimo Valor Total</a>
+        <a href="/relatorio">Ver Todos os Valores</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Método de Pagamento</th>
+                <th>Valor Máximo</th>
+                <th>Valor Mínimo</th>
+                <th>Valor Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for (let i = 0; i < resultados.length; i++) { %>
+                <tr>
+                    <td><%= resultados[i].MetodoPagamento %></td>
+                    <td><%= resultados[i].ValorMaximo %></td>
+                    <td><%= resultados[i].ValorMinimo %></td>
+                    <td><%= resultados[i].ValorTotal %></td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+    <button type="button" class="voltar" id="voltar">Voltar</button>
+
+    <script>
+        const voltar = document.getElementById('voltar');
+
+        voltar.addEventListener('click', () => {
+            window.location.href = '/options';
+        });
+    </script>
+</body>
+</html>
