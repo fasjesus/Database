@@ -141,8 +141,8 @@ CREATE TABLE metodo_pagamento (
 ALTER TABLE reserva 
 ADD COLUMN MetodoPagamento VARCHAR(255);
 
-==================================================================
-
+-- ================================================================== NÃO USAR, APENAS PARA FIM INFORMATIVO
+--
 SELECT MIN(Id_quarto) AS Id_quarto, NumeroQuarto, TipoQuarto
 FROM QUARTO
 GROUP BY NumeroQuarto, TipoQuarto
@@ -228,3 +228,19 @@ SET SQL_SAFE_UPDATES = 1;
 -- ============================================= USADO PARA CONSEGUIR ORDENAR OS QUARTOS COM ORDER BY PELO NÚMERO ================================
 --
 ALTER TABLE QUARTO MODIFY COLUMN NumeroQuarto INT;
+
+-- =============================================================================
+--
+-- Alterar tabela reserva para incluir FK_Id_pagamento e remover MetodoPagamento
+ALTER TABLE reserva
+ADD COLUMN FK_Id_pagamento INT,
+DROP COLUMN MetodoPagamento,
+ADD CONSTRAINT fk_reserva_metodo_pagamento FOREIGN KEY (FK_Id_pagamento) REFERENCES metodo_pagamento(id_metodoPag);
+
+
+DELETE FROM QUARTO
+WHERE Id_quarto = 1;
+
+INSERT INTO QUARTO (NumeroQuarto, TipoQuarto, Preco, Status)
+VALUES 
+    ('101', 'Standard', 150.00, 'Disponível');

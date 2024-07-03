@@ -310,41 +310,80 @@ app.post('/finalizar-reserva', (req, res) => {
                         res.status(500).send('Erro ao atualizar o status do quarto');
                         return;
                     }
-
-                    // Inserir reserva
+                    
+                    // Consultar se o método de pagamento já existe
                     connection.query(
-                        'INSERT INTO RESERVA (FK_Id_quarto, DataCheckIn, DataCheckOut, FK_Email, MetodoPagamento) VALUES (?, ?, ?, ?, ?)',
-                        [idQuarto, DataCheckIn, DataCheckOut, req.session.email, metodoPagamento],
-                        (err3) => {
+                        'SELECT id_metodoPag FROM metodo_pagamento WHERE nome_metodoPag = ?',
+                        [metodoPagamento],
+                        (err3, results) => {
                             if (err3) {
-                                console.error('Erro ao inserir reserva:', err3);
+                                console.error('Erro ao consultar método de pagamento:', err3);
                                 res.status(500).send('Erro ao finalizar a reserva');
                                 return;
                             }
 
-                            res.status(200).send('Reserva finalizada com sucesso');
+                            let metodoPagamentoId;
 
-                            // Atualizar o status do quarto para "Disponível" após o checkout
-                            const checkOutDate = new Date(DataCheckOut);
-                            setTimeout(() => {
+                            if (results.length > 0) {
+                                // Método de pagamento já existe, pegar o id_metodoPag existente
+                                metodoPagamentoId = results[0].id_metodoPag;
+                                inserirReserva(idQuarto, metodoPagamentoId);
+                            } else {
+                                // Método de pagamento não existe, inserir novo método de pagamento
                                 connection.query(
-                                    'UPDATE QUARTO SET Status = ? WHERE Id_quarto = ?',
-                                    ['Disponível', idQuarto],
-                                    (err4) => {
+                                    'INSERT INTO metodo_pagamento (nome_metodoPag) VALUES (?)',
+                                    [metodoPagamento],
+                                    (err4, result) => {
                                         if (err4) {
-                                            console.error('Erro ao atualizar o status do quarto na data de checkout:', err4);
+                                            console.error('Erro ao inserir método de pagamento:', err4);
+                                            res.status(500).send('Erro ao finalizar a reserva');
+                                            return;
                                         } else {
-                                            console.log('Status do quarto atualizado para "Disponível" na data de checkout');
+                                            metodoPagamentoId = result.insertId;
+                                            inserirReserva(idQuarto, metodoPagamentoId);
                                         }
                                     }
                                 );
-                            }, checkOutDate.getTime() - new Date().getTime());
+                            }
                         }
                     );
                 }
             );
         }
     );
+
+    // Função para inserir a reserva após garantir que o método de pagamento está registrado
+    function inserirReserva(idQuarto, metodoPagamentoId) {
+        connection.query(
+            'INSERT INTO reserva (FK_Id_quarto, DataCheckIn, DataCheckOut, FK_Email, FK_Id_pagamento) VALUES (?, ?, ?, ?, ?)',
+            [idQuarto, DataCheckIn, DataCheckOut, req.session.email, metodoPagamentoId],
+            (err5) => {
+                if (err5) {
+                    console.error('Erro ao inserir reserva:', err5);
+                    res.status(500).send('Erro ao finalizar a reserva');
+                } else {
+                    console.log('Reserva inserida com sucesso');
+                    res.status(200).send('Reserva finalizada com sucesso');
+
+                    // Atualizar o status do quarto para "Disponível" após o checkout
+                    const checkOutDate = new Date(DataCheckOut);
+                    setTimeout(() => {
+                        connection.query(
+                            'UPDATE QUARTO SET Status = ? WHERE Id_quarto = ?',
+                            ['Disponível', idQuarto],
+                            (err6) => {
+                                if (err6) {
+                                    console.error('Erro ao atualizar o status do quarto na data de checkout:', err6);
+                                } else {
+                                    console.log('Status do quarto atualizado para "Disponível" na data de checkout');
+                                }
+                            }
+                        );
+                    }, checkOutDate.getTime() - new Date().getTime());
+                }
+            }
+        );
+    }
 });
 
 
