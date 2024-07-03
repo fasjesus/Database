@@ -141,46 +141,6 @@ CREATE TABLE metodo_pagamento (
 ALTER TABLE reserva 
 ADD COLUMN MetodoPagamento VARCHAR(255);
 
--- ================================================================== NÃO USAR, APENAS PARA FIM INFORMATIVO
---
-SELECT MIN(Id_quarto) AS Id_quarto, NumeroQuarto, TipoQuarto
-FROM QUARTO
-GROUP BY NumeroQuarto, TipoQuarto
-HAVING COUNT(*) > 1;
-
-SELECT *
-FROM QUARTO
-WHERE (NumeroQuarto, TipoQuarto) IN (
-    SELECT NumeroQuarto, TipoQuarto
-    FROM QUARTO
-    GROUP BY NumeroQuarto, TipoQuarto
-    HAVING COUNT(*) > 1
-)
-ORDER BY NumeroQuarto, TipoQuarto, Id_quarto;
-
-SET SESSION sql_mode = '';
-
-SELECT Id_quarto, NumeroQuarto, TipoQuarto, COUNT(*)
-FROM QUARTO
-GROUP BY NumeroQuarto, TipoQuarto
-HAVING COUNT(*) > 1;
-
-SET SESSION sql_mode = 'ONLY_FULL_GROUP_BY';
-
-CREATE TEMPORARY TABLE temp_quartos AS
-SELECT MIN(Id_quarto) AS Id_quarto
-FROM QUARTO
-GROUP BY NumeroQuarto, TipoQuarto;
-
-SET SQL_SAFE_UPDATES = 0;
-
-DELETE FROM QUARTO
-WHERE Id_quarto NOT IN (SELECT Id_quarto FROM temp_quartos);
-
-DELETE q1
-FROM QUARTO q1
-LEFT JOIN temp_quartos tq ON q1.Id_quarto = tq.Id_quarto
-WHERE tq.Id_quarto IS NULL;
 
  -- ==================================== USADO PARA REMOVER AS RESERVAS DEFEITUOSAS FEITAS ANTERIORMENTE ====================================
  --
