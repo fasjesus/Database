@@ -391,59 +391,81 @@ app.post('/finalizar-reserva', (req, res) => {
 app.get('/historic', (req, res) => {
     const clienteEmail = req.session.email; // Obtém o e-mail da sessão
 
-    // Verifica se clienteEmail não está vazio ou indefinido
     if (!clienteEmail) {
         return res.status(400).send('Email do cliente não fornecido.');
     }
 
-    // Consulta SQL com funções agregadas
     const query = `
         SELECT 
-            quarto.NumeroQuarto, 
-            quarto.TipoQuarto, 
-            quarto.Preco, 
-            reserva.DataCheckIn, 
-            reserva.DataCheckOut,
-            (SELECT COUNT(*) FROM reserva
-                JOIN cliente ON cliente.email = reserva.FK_Email
-                WHERE cliente.email = '${clienteEmail}') AS totalReservas,
-            (SELECT SUM(quarto.Preco) FROM reserva
-                JOIN quarto ON quarto.Id_quarto = reserva.FK_Id_quarto
-                JOIN cliente ON cliente.email = reserva.FK_Email
-                WHERE cliente.email = '${clienteEmail}') AS totalGasto
+            quarto.Id_quarto,
+            quarto.TipoQuarto,
+            IFNULL(SUM(quarto.Preco), 0) AS totalGasto,
+            COUNT(reserva.Id_reserva) AS totalReservas,
+            reserva.DataCheckIn,
+            reserva.DataCheckOut
         FROM 
             reserva
             JOIN quarto ON quarto.Id_quarto = reserva.FK_Id_quarto
             JOIN cliente ON cliente.email = reserva.FK_Email
         WHERE 
-            cliente.email = '${clienteEmail}'
+            cliente.email = ?
+        GROUP BY 
+            quarto.TipoQuarto, quarto.Id_quarto, reserva.DataCheckIn, reserva.DataCheckOut WITH ROLLUP
     `;
 
-    // Execute a consulta
-    connection.query(query, [clienteEmail, clienteEmail, clienteEmail], (err, results) => {
+    connection.query(query, [clienteEmail], (err, results) => {
         if (err) {
             console.error('Erro ao obter reservas:', err);
             return res.status(500).send('Erro ao obter reservas');
         }
 
-        // Verifica se resultados foram recuperados
-        console.log('Resultados:', results);
+        const reservas = [];
+        let totalGastoGeral = 0;
+        let totalReservasGeral = 0;
+        let currentTipoQuarto = null;
+        let subtotalGasto = 0;
+        let subtotalReservas = 0;
 
-        // Extraímos as reservas e as informações agregadas dos resultados
-        const reservas = results.map(result => ({
-            NumeroQuarto: result.NumeroQuarto,
-            TipoQuarto: result.TipoQuarto,
-            Preco: result.Preco,
-            DataCheckIn: result.DataCheckIn,
-            DataCheckOut: result.DataCheckOut
-        }));
-        const totalGasto = parseFloat(results[0]?.totalGasto) || 0;
-        const totalReservas = results[0]?.totalReservas || 0;
+        results.forEach(result => {
+            if (result.TipoQuarto === null) {
+                totalGastoGeral = result.totalGasto;
+                totalReservasGeral = result.totalReservas;
+            } else {
+                if (currentTipoQuarto && currentTipoQuarto !== result.TipoQuarto) {
+                    reservas.push({
+                        Id_quarto: 'Subtotal',
+                        TipoQuarto: currentTipoQuarto,
+                        Preco: subtotalGasto,
+                        DataCheckIn: null,
+                        DataCheckOut: null,
+                        totalReservas: subtotalReservas
+                    });
+                    subtotalGasto = 0;
+                    subtotalReservas = 0;
+                }
+                currentTipoQuarto = result.TipoQuarto;
+                subtotalGasto += result.totalGasto;
+                subtotalReservas += result.totalReservas;
+                reservas.push(result);
+            }
+        });
 
-        // Envia os dados para a view
-        res.render('historic', { reservas, totalGasto, totalReservas });
+        if (currentTipoQuarto) {
+            reservas.push({
+                Id_quarto: 'Subtotal',
+                TipoQuarto: currentTipoQuarto,
+                Preco: subtotalGasto,
+                DataCheckIn: null,
+                DataCheckOut: null,
+                totalReservas: subtotalReservas
+            });
+        }
+
+        res.render('historic', { reservas, totalGastoGeral, totalReservasGeral });
     });
 });
+
+
 
 
 // Inicia o servidor
